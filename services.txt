@@ -1,0 +1,19 @@
+@controller controller_cart
+
+@controller controller_category
+testconnection
+listCategories
+
+@controller controller_product
+getProductDetailsById
+getAllProducts
+getProductsByCategory
+getProductsByFilter
+addProduct
+getUserProductsOffer
+
+@controller controller_user
+createUser
+loginUser
+getUserDetails
+

@@ -1,0 +1,137 @@
+var express = require('express'),
+  app = express(),
+  server = require('http'),
+  cons = require('consolidate'),
+  Sequelize = require('sequelize'),
+  swig = require('swig'),
+  fs = require('fs'),
+  https = require('https'),
+  path = require('path'),
+  errores = require('../error'),
+  connection = '';
+var config = require('../config.js')(app, express, cons, swig, path);
+var constantes = require('../constants/constants');
+var multer = require('multer');
+multer({
+  fileFilter: function (req, file, cb) {
+    var filetypes = /jpeg|jpg|png|gif|ico|bmp/;
+    var mimetype = filetypes.test(file.mimetype);
+    var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb("Error: File upload only supports the following filetypes - " + filetypes);
+  }
+});
+
+var storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/images/uploads')
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + '-' + Date.now())
+  }
+});
+var upload = multer({
+  storage: storage
+});
+//nombre de bd - usuario - contraseña
+//conexion a mysql
+const sequelize = new Sequelize(constantes.bd.nombre, constantes.bd.usuario, constantes.bd.password, {
+  host: 'localhost',
+  port: 3306,
+  dialect: 'mysql',
+  operatorsAliases: false
+});
+
+sequelize.authenticate().then(() => {})
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+//Inicializar modelos
+var models = {};
+models.sequelize = sequelize;
+models.Sequelize = Sequelize;
+models.User = require('../models/User')(sequelize, Sequelize);
+models.Category = require('../models/Category')(sequelize, Sequelize);
+models.Product = require('../models/Product')(sequelize, Sequelize, models);
+models.Product.belongsTo(models.User, {
+  foreignKey: 'userId',
+  targetkey: 'id'
+});
+models.User.hasMany(models.Product);
+models.Product.belongsTo(models.Category, {
+  foreignKey: 'categoryId',
+  targetkey: 'id'
+});
+models.Category.hasMany(models.Product);
+module.exports = models;
+
+//@controllers
+
+//@functionCallbacks
+
+function createCategoriesBatch() {
+  var categorias = [{
+      id: 1,
+      nombre: "Cereales"
+    },
+    {
+      id: 2,
+      nombre: "Tubérculos"
+    },
+    {
+      id: 3,
+      nombre: "Legumbres"
+    },
+    {
+      id: 4,
+      nombre: "Hortalizas"
+    },
+    {
+      id: 5,
+      nombre: "Frutas"
+    }, {
+      id: 6,
+      nombre: "Oleaginoza"
+    }
+  ];
+  models.Category.bulkCreate(categorias).then(() => {
+
+  }).catch((err) => {
+    console.log(err);
+  })
+};
+
+// agregar/actualizar cambios d tabla a base d datos -> sync(forced = true ) = drop and create table
+sequelize.sync({}).then(() => {
+  models.Category.count().then(c => {
+    if (c === 0) {
+      createCategoriesBatch();
+    }
+  })
+
+});
+
+// //@routes
+app.get('/', function (req, res) {
+})
+
+//@controllers
+
+//@functionCallbacks
+
+//Router para las Apis.
+var router = express.Router();
+app.post('/api/fileUpload', upload.single('image'), (req, res, next) => {
+  res.json({
+    'message': req.file.path
+  });
+});
+
+
+////////////////configuracion normal
+var puerto = constantes.var_configuracion.PUERTO_NODE;
+var servidorApp = server.createServer(app).listen(puerto, function () {
+  console.log('Express HTTP server listening on port ' + puerto);
+});

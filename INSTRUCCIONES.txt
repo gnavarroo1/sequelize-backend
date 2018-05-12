@@ -1,0 +1,1 @@
+cmd en folder y escribir gulp develop para lanzar servidor
