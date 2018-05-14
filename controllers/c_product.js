@@ -157,13 +157,6 @@ module.exports = function (models) {
                 nombre: {
                     [Op.like]: "%" + req.body.filter + "%"
                 }
-            },
-            include: {
-                model: models.User,
-                as: "user",
-                through: {
-                    attributes: ['id', 'nombre', 'apellidos', 'pais']
-                }
             }
         }).then(function (products) {
             if (products) {
@@ -192,7 +185,8 @@ module.exports = function (models) {
             preciounitario: product.price,
             descripcion: product.descripcion,
             categoryId: product.categoryId,
-            userId: product.userId
+            userId: product.userId,
+            imagen:product.image
         }).then((p) => {
             res.json({
                 result: true,
