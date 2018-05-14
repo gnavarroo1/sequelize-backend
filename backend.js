@@ -11,8 +11,11 @@ var express = require('express'),
 var config = require('../config.js')(app, express, cons, swig, path);
 var constantes = require('../constants/constants');
 var multer = require('multer');
-var filesDir = '/var/www/html/images/uploads';
-//
+var rootDir = '';
+var dir ='/images/uploads/';
+var filesDir = '/var/www/html/images/uploads/';
+// var filesDir = 'D:/repositorio/ecommerce/src/images/uploads';
+
 function mkdirParent(dirPath, mode, callback) {
   //Call the standard fs.mkdir
   fs.mkdir(dirPath, mode, function (error) {
@@ -142,10 +145,10 @@ app.post('/api/fileUpload', upload.single('image'), (req, res) => {
       message: req.fileValidationError,
       status: 300
     })
-  } else {
-    console.log(req.file);
+  } else {  
+    var routeToImage = dir+req.file.filename
     res.json({
-      message: req.file.destination,
+      imageSrc: routeToImage,
       status: 200
     });
   }

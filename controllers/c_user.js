@@ -14,7 +14,7 @@ module.exports = function (models) {
         var email = req.body.email;
         var password = req.body.password;
         var tipoUsuario = req.body.tipousuario;
-        var imagen = req.body.imagen;
+        var imagen = req.body.image;
         var message = {
             nombre: "",
             nrodocumento: "",
@@ -130,6 +130,7 @@ module.exports = function (models) {
             },
             attributes: ['id', 'nombre', "email", "nrodocumento", "imagen", "tipoUsuario","createdAt"]
         }).then((user) => {
+            console.log(user);
             if (user) {
                 res.json({
                     message: "",
