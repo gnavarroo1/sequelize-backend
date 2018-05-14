@@ -12,7 +12,7 @@ var config = require('../config.js')(app, express, cons, swig, path);
 var constantes = require('../constants/constants');
 var multer = require('multer');
 var filesDir = '/var/www/html/images/uploads';
-
+//
 function mkdirParent(dirPath, mode, callback) {
   //Call the standard fs.mkdir
   fs.mkdir(dirPath, mode, function (error) {
@@ -143,8 +143,9 @@ app.post('/api/fileUpload', upload.single('image'), (req, res) => {
       status: 300
     })
   } else {
+    console.log(req.file);
     res.json({
-      message: req.file.path,
+      message: req.file.destination,
       status: 200
     });
   }
