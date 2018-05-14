@@ -140,6 +140,7 @@ app.get('/', function (req, res) {
 })
 
 app.post('/api/fileUpload', upload.single('image'), (req, res) => {
+  console.log(req.body);
   if (req.fileValidationError) {
     res.json({
       message: req.fileValidationError,
