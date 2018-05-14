@@ -11,19 +11,38 @@ var express = require('express'),
 var config = require('../config.js')(app, express, cons, swig, path);
 var constantes = require('../constants/constants');
 var multer = require('multer');
+var filesDir = '/var/www/html/images/uploads';
+
+function mkdirParent(dirPath, mode, callback) {
+  //Call the standard fs.mkdir
+  fs.mkdir(dirPath, mode, function (error) {
+    //When it fail in this way, do the custom steps
+    if (error && error.code === 'ENOENT') {
+      //Create all the parents recursively
+      mkdirParent(path.dirname(dirPath), mode,mkdirParent.bind(this, dirPath, mode, callback));
+    } else if (callback) {
+      //Manually run the callback since we used our own callback to do all these
+      callback(error);
+    }
+  });
+}
+
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'public/images/uploads')
+    if (!fs.existsSync(filesDir)) {
+      mkdirParent(filesDir)
+    }
+    cb(null, filesDir)
   },
   filename: (req, file, cb) => {
     cb(null, file.fieldname + '-' + Date.now())
   }
 });
+
 var upload = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
-    console.log(file);
     var ext = path.extname(file.originalname);
     if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== 'ico' && ext !== '.bmp') {
       req.fileValidationError = "Extension de archivo no valido";
