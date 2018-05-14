@@ -13,8 +13,8 @@ var constantes = require('../constants/constants');
 var multer = require('multer');
 var rootDir = '';
 var dir ='images/uploads/';
-// var filesDir = '/var/www/html/images/uploads';
-var filesDir = 'D:/repositorio/ecommerce/src/images/uploads';
+var filesDir = '/var/www/html/images/uploads';
+// var filesDir = 'D:/repositorio/ecommerce/src/images/uploads';
 
 function mkdirParent(dirPath, mode, callback) {
   //Call the standard fs.mkdir
