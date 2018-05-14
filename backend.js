@@ -7,22 +7,10 @@ var express = require('express'),
   fs = require('fs'),
   https = require('https'),
   path = require('path'),
-  errores = require('../error'),
-  connection = '';
+  errores = require('../error')
 var config = require('../config.js')(app, express, cons, swig, path);
 var constantes = require('../constants/constants');
 var multer = require('multer');
-multer({
-  fileFilter: function (req, file, cb) {
-    var filetypes = /jpeg|jpg|png|gif|ico|bmp/;
-    var mimetype = filetypes.test(file.mimetype);
-    var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb("Error: File upload only supports the following filetypes - " + filetypes);
-  }
-});
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -33,8 +21,18 @@ var storage = multer.diskStorage({
   }
 });
 var upload = multer({
-  storage: storage
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    console.log(file);
+    var ext = path.extname(file.originalname);
+    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== 'ico' && ext !== '.bmp') {
+      req.fileValidationError = "Extension de archivo no valido";
+      return cb(null, false, req.fileValidationError);
+    }
+    cb(null, true);
+  }
 });
+
 //nombre de bd - usuario - contraseña
 //conexion a mysql
 const sequelize = new Sequelize(constantes.bd.nombre, constantes.bd.usuario, constantes.bd.password, {
@@ -66,10 +64,6 @@ models.Product.belongsTo(models.Category, {
 });
 models.Category.hasMany(models.Product);
 module.exports = models;
-
-//@controllers
-
-//@functionCallbacks
 
 function createCategoriesBatch() {
   var categorias = [{
@@ -113,24 +107,31 @@ sequelize.sync({}).then(() => {
 
 });
 
-// //@routes
-app.get('/', function (req, res) {
-})
 
 //@controllers
 
 //@functionCallbacks
 
-//Router para las Apis.
-var router = express.Router();
-app.post('/api/fileUpload', upload.single('image'), (req, res, next) => {
-  res.json({
-    'message': req.file.path
-  });
+//@routes
+app.get('/', function (req, res) {
+  return res.send("hola mundo");
+})
+
+app.post('/api/fileUpload', upload.single('image'), (req, res) => {
+  if (req.fileValidationError) {
+    res.json({
+      message: req.fileValidationError,
+      status: 300
+    })
+  } else {
+    res.json({
+      message: req.file.path,
+      status: 200
+    });
+  }
 });
 
-
-////////////////configuracion normal
+//configuracion normal
 var puerto = constantes.var_configuracion.PUERTO_NODE;
 var servidorApp = server.createServer(app).listen(puerto, function () {
   console.log('Express HTTP server listening on port ' + puerto);
