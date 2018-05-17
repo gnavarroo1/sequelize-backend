@@ -76,7 +76,8 @@ module.exports = function (models) {
             },{
                 model: models.Category,
                 attributes: ['nombre']
-            }]
+            }],
+            attributes:['nombre','descripcion','preciounitario','imagen']
         }).then(function (products) {
             if (products) {
                 response.data.products = products;
@@ -110,8 +111,10 @@ module.exports = function (models) {
         models.Product.findAll({
             include: [{
                 model: models.User,
-                attributes: ['id', 'nombre']
-                
+                attributes: ['nombre']
+            },{
+                model: models.Category,
+                attributes: ['nombre']
             }],
             where: {
                 categoryID: {
@@ -120,7 +123,8 @@ module.exports = function (models) {
                 nombre: {
                     [Op.like]: searchFilter + "%"
                 }
-            }
+            },
+            attributes:['nombre','descripcion','preciounitario','imagen']   
         }).then(function (products) {
             if (products) {
                 response.data.products = products;
@@ -178,7 +182,6 @@ module.exports = function (models) {
     //@servlet post
     this.addProduct = function (req, res) {
         var product = req.body;
-        console.log(product);
         models.Product.create({
             nombre: product.nombre,
             cantidad: product.cantidad,

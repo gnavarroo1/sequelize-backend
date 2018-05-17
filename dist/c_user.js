@@ -130,7 +130,6 @@ module.exports = function (models) {
             },
             attributes: ['id', 'nombre', "email", "nrodocumento", "imagen", "tipoUsuario","createdAt"]
         }).then((user) => {
-            console.log(user);
             if (user) {
                 res.json({
                     message: "",
