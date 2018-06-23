@@ -1,5 +1,4 @@
-module.exports = function (app, express, cons, swig, path) {
-  var constantes = require('./constants/constants');
+module.exports = function (app, express, cons, nunjucks, path) {
   var logger = require('morgan');
   var bodyParser = require('body-parser');
   var allowCrossDomain = function (req, res, next) {
@@ -16,8 +15,8 @@ module.exports = function (app, express, cons, swig, path) {
   app.use(bodyParser.urlencoded({
     extended: true
   }));
-  //conf engine swig
-  app.engine('.html', cons.swig);
+  //conf engine nunjucks
+  app.engine('.html', cons.nunjucks);
   app.set('view engine', 'html');
   app.set('views', __dirname + '/views');
 

@@ -3,12 +3,9 @@ var express = require('express'),
   server = require('http'),
   cons = require('consolidate'),
   Sequelize = require('sequelize'),
-  swig = require('swig'),
-  fs = require('fs'),
-  https = require('https'),
-  path = require('path'),
-  errores = require('../error')
-var config = require('../config.js')(app, express, cons, swig, path);
+  nunjucks = require('nunjucks'),
+  path = require('path')
+var config = require('../config.js')(app, express, cons, nunjucks, path);
 var constantes = require('../constants/constants');
 var multer = require('multer');
 var rootDir = '';
@@ -90,26 +87,19 @@ module.exports = models;
 function createCategoriesBatch() {
   var categorias = [{
       id: 1,
-      nombre: "Cereales"
+      nombre: "Deportes"
     },
     {
       id: 2,
-      nombre: "Tubérculos"
+      nombre: "Cine"
     },
     {
       id: 3,
-      nombre: "Legumbres"
+      nombre: "Teatro"
     },
     {
       id: 4,
-      nombre: "Hortalizas"
-    },
-    {
-      id: 5,
-      nombre: "Frutas"
-    }, {
-      id: 6,
-      nombre: "Oleaginoza"
+      nombre: "Conciertos"
     }
   ];
   models.Category.bulkCreate(categorias).then(() => {
@@ -119,7 +109,7 @@ function createCategoriesBatch() {
   })
 };
 
-// agregar/actualizar cambios d tabla a base d datos -> sync(forced = true ) = drop and create table
+// agregar/actualizar cambios d tabla a base d datos -> sync(forced : true ) = drop and create table
 sequelize.sync({}).then(() => {
   models.Category.count().then(c => {
     if (c === 0) {
